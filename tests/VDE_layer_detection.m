@@ -7,8 +7,7 @@ addpath(libDir)
 addincludepath;
 
 %% initialization
-% meteorFile = fullfile(projectDir, 'data', 'radiosonde_57494_20140101_0000.nc');
-tRange = [datenum(2013, 8, 1, 0, 40, 0), datenum(2013, 8, 1, 23, 45, 0)];
+tRange = [datenum(2011, 6, 26, 0, 0, 0), datenum(2011, 6, 26, 23, 25, 0)];
 hRange = [0, 20];
 dataFile = fullfile(projectDir, 'data', sprintf('MUA_PLidar_%s.h5', datestr(tRange(1), 'yyyymmdd')));
 figFile = fullfile(projectDir, 'img', sprintf('VDE_layer_detection.png'));
