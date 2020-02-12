@@ -23,6 +23,8 @@ function [layerInfo, PD, PN] = VDE_cld(signal, height, BG, minLayerDepth, ...
 %           the layer base height. [km]
 %       topHeight: numeric
 %           the layer top height. [km]
+%       peakHeight: numeric
+%           the layer height with maximum backscatter signal. [km]
 %       layerDepth: numeric
 %           geometrical depth of the layer. [km]
 %       flagCloud: logical
@@ -59,7 +61,7 @@ if floor(minLayerDepth / (height(2) - height(1))) < 3
 end
 
 layerInfo = struct('id', {}, 'baseHeight', {}, 'topHeight', {}, ...
-                   'layerDepth', {}, 'flagCloud', {});
+                   'peakHeight', {}, 'layerDepth', {}, 'flagCloud', {});
 
 minIndex = find(height >= minHeight, 1);
 if isempty(minIndex)
@@ -121,7 +123,8 @@ for iLayer = 1:nLayer
     layerDepth = height(topIndex) - height(baseIndex);
 
     if (layerDepth >= minLayerDepth) && ...
-       (mean(P(L == iLayer)) >= max([mean(noise_level(L == iLayer)*2), sqrt(BG)*3]))
+       (mean(P(L == iLayer)) >= max([mean(noise_level(L == iLayer)*2), ...
+                                          sqrt(BG)*3]))
         layerN = layerN + 1;
         layerInfo(layerN).id = layerN;
         layerInfo(layerN).baseHeight = height(baseIndex);
@@ -141,10 +144,12 @@ for iLayer = 1:length(layerInfo)
     Fz = diff(log(sig .* height(indx).^2)) ./ ...
          diff(height(indx));
 
-    T = max(sig) / sig(1);
+    [maxSig, maxIndx] = max(sig);
+    T = maxSig / sig(1);
     D = min(Fz);
     layerHeight = mean([layerInfo(iLayer).baseHeight, ...
                         layerInfo(iLayer).topHeight]);
+    layerInfo(iLayer).peakHeight = height(maxIndx);
 
     if layerHeight <= 5
         if T > 4 || D < -7
